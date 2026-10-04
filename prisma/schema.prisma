@@ -12,3 +12,29 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model Projeto {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome        String
+  subtitulo   String
+  descricao   String
+  status      String
+  tags        String[]
+  pesquisadores String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Conferencia {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  acronimo    String
+  nome        String
+  qualificacao String
+  subtitulo   String
+  localizacao String
+  data        DateTime
+  deadline    DateTime
+  link        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
