@@ -6,6 +6,8 @@ export class Projeto {
   status: string;
   tags: string[];
   pesquisadores: string[];
+  parceiro: string;
+  websiteUrl: string;
   createdAt: Date;
   updatedAt: Date;
 }
