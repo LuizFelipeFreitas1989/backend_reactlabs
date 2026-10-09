@@ -8,9 +8,19 @@ import { NewsModule } from './news/news.module.js';
 import { ResearchAreaModule } from './research_area/research_area.module.js';
 import { PersonModule } from './person/person.module.js';
 import { PartnersModule } from './partners/partners.module.js';
+import { JournalModule } from './journal/journal.module.js';
 
 @Module({
-  imports: [PrismaModule, ProjetoModule, ConferenciaModule, NewsModule, ResearchAreaModule, PersonModule, PartnersModule],
+  imports: [
+    PrismaModule,
+    ProjetoModule,
+    ConferenciaModule,
+    NewsModule,
+    ResearchAreaModule,
+    PersonModule,
+    PartnersModule,
+    JournalModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
