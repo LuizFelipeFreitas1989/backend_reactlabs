@@ -1,7 +1,10 @@
 export class Partner {
-    name: string;
-    type: string;
-    country: string;
-    description: string;
-    websiteUrl: string;
+  id: string;
+  name: string;
+  type: string;
+  country: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
