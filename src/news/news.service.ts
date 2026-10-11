@@ -1,26 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateNewsDto } from './dto/create-news.dto.js';
 import { UpdateNewsDto } from './dto/update-news.dto.js';
 
 @Injectable()
 export class NewsService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createNewsDto: CreateNewsDto) {
-    return 'This action adds a new news';
+    return this.prisma.news.create({
+      data: {
+        title: createNewsDto.title,
+        content: createNewsDto.content,
+        link: createNewsDto.link,
+      },
+    });
   }
 
   findAll() {
-    return `This action returns all news`;
+    return this.prisma.news.findMany({ orderBy: { createdAt: 'desc' } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} news`;
+  async findOne(id: string) {
+    const news = await this.prisma.news.findUnique({ where: { id } });
+
+    if (!news) {
+      throw new NotFoundException(`Notícia com ID '${id}' não encontrada`);
+    }
+
+    return news;
   }
 
-  update(id: number, updateNewsDto: UpdateNewsDto) {
-    return `This action updates a #${id} news`;
+  async update(id: string, updateNewsDto: UpdateNewsDto) {
+    await this.findOne(id);
+
+    return this.prisma.news.update({
+      where: { id },
+      data: {
+        ...(updateNewsDto.title !== undefined && {
+          title: updateNewsDto.title,
+        }),
+        ...(updateNewsDto.content !== undefined && {
+          content: updateNewsDto.content,
+        }),
+        ...(updateNewsDto.link !== undefined && { link: updateNewsDto.link }),
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} news`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.news.delete({ where: { id } });
   }
 }
