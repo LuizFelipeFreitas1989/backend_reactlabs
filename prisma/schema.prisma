@@ -70,21 +70,35 @@ model News {
   updatedAt   DateTime @updatedAt
 }
 
+model Publication {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  journal        String
+  year           Int
+  doi            String
+  authorIDs      String[] @db.ObjectId
+  authors        Person[] @relation("PublicationAuthors", fields: [authorIDs], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 model Person {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  occupation  String
-  institution String
-  tags        String[]
-  lattesCv   String
-  orcid      String
-  googleScholar String
-  linkedIn   String
-  website    String
-  about      String
-  orientor    Person?  @relation("StudentAdvisor", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction) 
-  students     Person[]  @relation("StudentAdvisor")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  occupation     String
+  institution    String
+  tags           String[]
+  lattesCv       String
+  orcid          String
+  googleScholar  String
+  linkedIn       String
+  website        String
+  about          String
+  orientor       Person?       @relation("StudentAdvisor", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction) 
+  students       Person[]      @relation("StudentAdvisor")
+  publicationIDs String[]      @db.ObjectId
+  publications   Publication[] @relation("PublicationAuthors", fields: [publicationIDs], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
