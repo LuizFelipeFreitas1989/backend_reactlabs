@@ -8,7 +8,18 @@ describe('NewsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [NewsController],
-      providers: [NewsService],
+      providers: [
+        {
+          provide: NewsService,
+          useValue: {
+            create: vi.fn(),
+            findAll: vi.fn(),
+            findOne: vi.fn(),
+            update: vi.fn(),
+            remove: vi.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<NewsController>(NewsController);
