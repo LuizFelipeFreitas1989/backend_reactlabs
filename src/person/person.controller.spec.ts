@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import 'multer';
 import { PersonController } from './person.controller.js';
 import { PersonService } from './person.service.js';
 
@@ -38,7 +39,7 @@ describe('PersonController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should call service.create with dto', async () => {
+  it('should call service.create with dto when no file provided', async () => {
     const dto = {
       name: 'Maria Silva',
       occupation: 'Professora',
@@ -55,7 +56,28 @@ describe('PersonController', () => {
 
     const result = await controller.create(dto);
     expect(result).toEqual(expected);
-    expect(service.create).toHaveBeenCalledWith(dto);
+    expect(service.create).toHaveBeenCalledWith(dto, undefined);
+  });
+
+  it('should call service.create with dto and file when file is provided', async () => {
+    const dto = {
+      name: 'Maria Silva',
+      occupation: 'Professora',
+      institution: 'UFMG',
+      lattesCv: 'http://lattes.cnpq.br/123',
+      orcid: '0000-0002-1825-0097',
+      googleScholar: 'https://scholar.google.com/citations?user=123',
+      linkedIn: 'https://linkedin.com/in/mariasilva',
+      website: 'https://mariasilva.com',
+      about: 'Pesquisadora.',
+    };
+    const file = { originalname: 'avatar.png' } as Express.Multer.File;
+    const expected = { id: '64b1f0000000000000000001', ...dto };
+    service.create.mockResolvedValue(expected);
+
+    const result = await controller.create(dto, file);
+    expect(result).toEqual(expected);
+    expect(service.create).toHaveBeenCalledWith(dto, file);
   });
 
   it('should call service.findAll with optional search', async () => {

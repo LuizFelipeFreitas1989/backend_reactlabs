@@ -7,17 +7,39 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import 'multer';
 import { PersonService } from './person.service.js';
 import { CreatePersonDto } from './dto/create-person.dto.js';
 import { UpdatePersonDto } from './dto/update-person.dto.js';
+import { CurriculumService } from '../curriculum/curriculum.service.js';
 
 @Controller('person')
 export class PersonController {
-  constructor(private readonly personService: PersonService) {}
+  constructor(private readonly personService: PersonService,
+    private readonly curriculumService: CurriculumService
+  ) {}
 
   @Post()
-  create(@Body() createPersonDto: CreatePersonDto) {
+  @ApiOperation({
+    summary:
+      'Criar uma nova pessoa (aceita multipart/form-data com upload de arquivo ou application/json)',
+  })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @UseInterceptors(FileInterceptor('file'))
+  create(
+    @Body() createPersonDto: CreatePersonDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    createPersonDto.tags = createPersonDto?.tags ? (createPersonDto.tags as unknown as string).split(',').map((tag) => tag.trim()) : [];
+    createPersonDto.publicationIDs = createPersonDto?.publicationIDs ? (createPersonDto.publicationIDs as unknown as string).split(',').map((id) => id.trim()) : [];
+
+    const curriculum = this.curriculumService.create();
+
     return this.personService.create(createPersonDto);
   }
 
