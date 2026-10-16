@@ -102,3 +102,7 @@ model Person {
   updatedAt      DateTime      @updatedAt
 }
 
+model Curriculum {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  CURRICULUM_VITAE Json
+}

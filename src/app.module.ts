@@ -9,6 +9,7 @@ import { ResearchAreaModule } from './research_area/research_area.module.js';
 import { PersonModule } from './person/person.module.js';
 import { PartnersModule } from './partners/partners.module.js';
 import { JournalModule } from './journal/journal.module.js';
+import { CurriculumModule } from './curriculum/curriculum.module.js';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JournalModule } from './journal/journal.module.js';
     PersonModule,
     PartnersModule,
     JournalModule,
+    CurriculumModule,
   ],
   controllers: [AppController],
   providers: [AppService],

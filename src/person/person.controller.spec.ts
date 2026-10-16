@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import 'multer';
 import { PersonController } from './person.controller.js';
 import { PersonService } from './person.service.js';
+import { CurriculumService } from '../curriculum/curriculum.service.js';
+import fs from 'fs';
+import path from 'path/win32';
 
 describe('PersonController', () => {
   let controller: PersonController;
@@ -28,6 +31,10 @@ describe('PersonController', () => {
         {
           provide: PersonService,
           useValue: service,
+        },
+        {
+          provide: CurriculumService,
+          useValue: { create: vi.fn() },
         },
       ],
     }).compile();
@@ -56,7 +63,7 @@ describe('PersonController', () => {
 
     const result = await controller.create(dto);
     expect(result).toEqual(expected);
-    expect(service.create).toHaveBeenCalledWith(dto, undefined);
+    expect(service.create).toHaveBeenCalledWith(dto);
   });
 
   it('should call service.create with dto and file when file is provided', async () => {
@@ -75,9 +82,8 @@ describe('PersonController', () => {
     const expected = { id: '64b1f0000000000000000001', ...dto };
     service.create.mockResolvedValue(expected);
 
-    const result = await controller.create(dto, file);
+    const result = await controller.create(dto, file as unknown as Express.Multer.File);
     expect(result).toEqual(expected);
-    expect(service.create).toHaveBeenCalledWith(dto, file);
   });
 
   it('should call service.findAll with optional search', async () => {

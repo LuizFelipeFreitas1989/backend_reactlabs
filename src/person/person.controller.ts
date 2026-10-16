@@ -17,12 +17,13 @@ import { PersonService } from './person.service.js';
 import { CreatePersonDto } from './dto/create-person.dto.js';
 import { UpdatePersonDto } from './dto/update-person.dto.js';
 import { CurriculumService } from '../curriculum/curriculum.service.js';
+import { parseStringPromise } from "xml2js"
 
 @Controller('person')
 export class PersonController {
   constructor(private readonly personService: PersonService,
     private readonly curriculumService: CurriculumService
-  ) {}
+  ) { }
 
   @Post()
   @ApiOperation({
@@ -31,14 +32,27 @@ export class PersonController {
   })
   @ApiConsumes('multipart/form-data', 'application/json')
   @UseInterceptors(FileInterceptor('file'))
-  create(
+  async create(
     @Body() createPersonDto: CreatePersonDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     createPersonDto.tags = createPersonDto?.tags ? (createPersonDto.tags as unknown as string).split(',').map((tag) => tag.trim()) : [];
     createPersonDto.publicationIDs = createPersonDto?.publicationIDs ? (createPersonDto.publicationIDs as unknown as string).split(',').map((id) => id.trim()) : [];
 
-    const curriculum = this.curriculumService.create();
+    if (file) {
+      try {
+        const xmlData = file?.buffer.toString('utf8') ?? "";
+        const result = await parseStringPromise(xmlData);
+        const curriculum = await this.curriculumService.create(
+          { CURRICULUM_VITAE: result }
+        );
+
+        createPersonDto.lattesCv = curriculum.id;
+
+      } catch (error) {
+        console.log('Error parsing XML:', error);
+      }
+    }
 
     return this.personService.create(createPersonDto);
   }
