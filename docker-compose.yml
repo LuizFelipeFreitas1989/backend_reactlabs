@@ -26,9 +26,10 @@ services:
     ports:
       - "${WEB_PORT:-3000}:3000"
     environment:
-      # The back-end's MongoDB container publishes port 27017 on the host machine;
-      # host.docker.internal is how this container reaches the host.
-      MONGO_URL: ${MONGO_URL:-mongodb://root:example@host.docker.internal:27017/}
+      # The database Prisma reads (prisma/schema.prisma): DATABASE_URL from this folder's .env,
+      # such as the Atlas cluster, or else the mongo service above. In this container, localhost
+      # is the container itself, so a .env address with localhost does not work here.
+      DATABASE_URL: ${DATABASE_URL:-mongodb://root:example@mongo:27017/react_labs?authSource=admin}
       # File-change events do not reach containers from Windows folders, so Vite polls.
       WATCH_POLLING: "true"
     extra_hosts:
