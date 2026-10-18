@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Projeto {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome        String
+  subtitulo   String
+  descricao   String
+  status      String
+  tags        String[]
+  pesquisadores String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Conferencia {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  acronimo    String
+  nome        String
+  qualificacao String
+  subtitulo   String
+  localizacao String
+  data        DateTime
+  deadline    DateTime
+  link        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Journal {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  acronym   String
+  name      String
+  publisher String
+  qualis    String
+  topics    String
+  link      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Partner {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  type        String
+  country     String
+  description String
+  websiteUrl  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model News {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String
+  link        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Publication {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  journal        String
+  year           Int
+  doi            String
+  authorIDs      String[] @db.ObjectId
+  authors        Person[] @relation("PublicationAuthors", fields: [authorIDs], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Person {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  occupation     String
+  institution    String
+  tags           String[]
+  lattesCv       String
+  orcid          String
+  googleScholar  String
+  linkedIn       String
+  website        String
+  about          String
+  orientor       Person?       @relation("StudentAdvisor", fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction) 
+  students       Person[]      @relation("StudentAdvisor")
+  publicationIDs String[]      @db.ObjectId
+  publications   Publication[] @relation("PublicationAuthors", fields: [publicationIDs], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Curriculum {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  CURRICULUM_VITAE Json
+}

@@ -1,0 +1,42 @@
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
+      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+
+  api:
+    build:
+      context: .
+      
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      # The database Prisma reads (prisma/schema.prisma): DATABASE_URL from this folder's .env,
+      # such as the Atlas cluster, or else the mongo service above. In this container, localhost
+      # is the container itself, so a .env address with localhost does not work here.
+      DATABASE_URL: ${DATABASE_URL:-mongodb://root:example@mongo:27017/react_labs?authSource=admin}
+      # File-change events do not reach containers from Windows folders, so Vite polls.
+      WATCH_POLLING: "true"
+    extra_hosts:
+      # Makes host.docker.internal work on Linux too (Docker Desktop already provides it).
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Your code is mounted into the container, so changes reload in the browser.
+      - ./:/app
+      # node_modules stays inside the container and is never written to your folder.
+      - /app/node_modules

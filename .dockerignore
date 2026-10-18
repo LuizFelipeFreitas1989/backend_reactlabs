@@ -1,0 +1,11 @@
+# Kept out of the image build: the image installs its own packages and builds its own output,
+# and secrets (.env holds the database address with its password) must never enter the image.
+node_modules
+dist
+coverage
+generated
+.git
+.env
+.env.*
+!.env.example
+*.log
